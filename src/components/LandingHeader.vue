@@ -1,0 +1,33 @@
+<template>
+  <header class="p-4 d-flex justify-content-between align-items-center">
+    <div
+      class="logo d-flex justify-content-between align-items-center"
+      @click="$router.push('/')"
+    >
+      <img src="@/assets/blog.png" class="img-fluid" alt="" />
+      <h1>SEF Blogs</h1>
+    </div>
+    <div class="navs">
+      <router-link to="/signup" class="btn btn-dark me-4"> Signup </router-link>
+      <router-link to="/login" class="btn btn-outline-dark">
+        Login
+      </router-link>
+    </div>
+  </header>
+</template>
+
+<script>
+export default {};
+</script>
+
+<style lang="scss" scoped>
+header {
+  .logo {
+    cursor: pointer;
+    img {
+      width: 80px;
+      margin-right: 10px;
+    }
+  }
+}
+</style>
