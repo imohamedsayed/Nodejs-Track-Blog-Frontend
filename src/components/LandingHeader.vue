@@ -5,7 +5,7 @@
       @click="$router.push('/')"
     >
       <img src="@/assets/blog.png" class="img-fluid" alt="" />
-      <h1>SEF Blogs</h1>
+      <h3>SEF Blogs</h3>
     </div>
     <div class="navs">
       <router-link to="/signup" class="btn btn-dark me-4"> Signup </router-link>
@@ -24,8 +24,11 @@ export default {};
 header {
   .logo {
     cursor: pointer;
+    h3 {
+      margin: 0;
+    }
     img {
-      width: 80px;
+      width: 60px;
       margin-right: 10px;
     }
   }

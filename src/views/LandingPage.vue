@@ -10,7 +10,9 @@
             others' blogs
           </p>
           <div class="actions">
-            <button class="btn start-now">Start Now</button>
+            <button class="btn start-now" @click="$router.push('/blogs')">
+              Start Now
+            </button>
           </div>
         </div>
         <img src="../assets/blog_i.jpg" alt="" class="back-photo" />
