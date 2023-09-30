@@ -91,19 +91,21 @@ export default {
   setup() {
     const store = useStore();
     const router = useRouter();
-
-    onMounted(() => {
-      if (state.customer) {
-        router.push("/home");
-      }
-    });
     const state = reactive({
+      user: computed(() => store.state.user),
       name: "",
       email: "",
       password: "",
       passwordConfirm: "",
       loading: false,
     });
+    onMounted(() => {
+
+      if (state.user) {
+        router.push("/blogs");
+      }
+    });
+
     const rules = computed(() => {
       return {
         email: { required, email },
@@ -126,17 +128,17 @@ export default {
         };
 
         try {
-          // await store.dispatch("customerSignup", data);
+          await store.dispatch("signup", data);
           toast.success("Account Created Successfully", {
             autoClose: 1000,
           });
+          router.push("/blogs");
         } catch (err) {
-          toast.error(err, {
+          toast.error(err.message, {
             autoClose: 1000,
           });
         }
         state.loading = false;
-        router.push("/home");
       } else {
         toast.error("Invalid Data", {
           autoClose: 1000,

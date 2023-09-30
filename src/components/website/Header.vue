@@ -8,19 +8,19 @@
       <h3>SEF Blogs</h3>
     </div>
     <div class="navs text-center">
-      <a href="#" v-if="state.customer?.isAdmin">Blogs</a>
+      <router-link to="/all-blogs">Blogs</router-link>
       <router-link to="/blogs">My Blogs</router-link>
-      <a href="#">Create a blog</a>
+      <router-link to="/blogs/create">Create a blog</router-link>
     </div>
     <div class="public">
-      <div class="d-flex align-items-center" v-if="state.customer">
+      <div class="d-flex align-items-center" v-if="state.user">
         <div class="img me-2">
-          <img :src="'http://localhost:8000/' + state.customer.image" alt="" />
+          <img :src="'http://localhost:8000/' + state.user.image" alt="" />
         </div>
         <div class="info pe-2">
-          <p class="m-0 fw-bold">{{ state.customer.name }}</p>
+          <p class="m-0 fw-bold">{{ state.user.name }}</p>
           <span class="text-muted me-3">{{
-            state.customer.role == 0 ? "Customer" : "Admin"
+            state.user.isAdmin ? "Admin" : "User"
           }}</span>
           <span class="dropdown">
             <i
@@ -30,15 +30,6 @@
               data-bs-toggle="dropdown"
             ></i>
             <ul class="dropdown-menu me-5">
-              <li>
-                <router-link
-                  :to="{ name: 'Settings' }"
-                  class="dropdown-item"
-                  href="#"
-                >
-                  <i class="fa-solid fa-user me-2"></i> Profile</router-link
-                >
-              </li>
               <li>
                 <a
                   class="dropdown-item text-danger fw-bold"
@@ -68,7 +59,7 @@ export default {
     const store = useStore();
     const router = useRouter();
     const state = reactive({
-      customer: computed(() => store.state.user),
+      user: computed(() => store.state.user),
     });
 
     const logout = () => {

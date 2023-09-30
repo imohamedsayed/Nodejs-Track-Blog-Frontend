@@ -1,11 +1,9 @@
-import axios from "axios";
+import Api from "../axios";
 import { createStore } from "vuex";
 import createPersistedState from "vuex-persistedstate";
 import * as cookies from "js-cookie";
 const state = {
   user: null,
-  token: null,
-  cart: [],
 };
 const mutations = {
   setUser(state, user) {
@@ -28,6 +26,33 @@ const mutations = {
 };
 
 const actions = {
+  async signup(context, { name, email, password }) {
+    const res = await Api.post("/auth/signup", { name, email, password });
+    if (res.status === 201) {
+      const user = res.data.user;
+      context.commit("setUser", user);
+    } else {
+      throw new Error(res.response.data.message);
+    }
+    try {
+    } catch (error) {
+      throw error;
+    }
+  },
+  async login(context, {  email, password }) {
+    const res = await Api.post("/auth/login", { email, password });
+    if (res.status === 200) {
+      const user = res.data.user;
+      context.commit("setUser", user);
+    } else {
+      throw new Error(res.response.data.message);
+    }
+    try {
+    } catch (error) {
+      throw error;
+    }
+  },
+
   Logout(context) {
     context.commit("setToken", null);
     context.commit("setUser", null);

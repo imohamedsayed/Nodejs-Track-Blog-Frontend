@@ -11,17 +11,13 @@
 
 <script>
 import Header from "@/components/website/Header.vue";
-import { computed, onMounted, reactive } from "vue";
-import Blog from "@/components/website/myBlogs/Blog.vue";
-import { useStore } from "vuex";
+import { onMounted, reactive } from "vue";
+import Blog from "@/components/website/allBlogs/Blog.vue";
 export default {
   components: { Header, Blog },
   setup() {
-    const store = useStore();
-
     const state = reactive({
       blogs: [],
-      user: computed(() => store.state.user),
     });
 
     onMounted(() => {

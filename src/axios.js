@@ -1,13 +1,16 @@
 import axios from "axios";
 import store from "./store/index";
 
-const token = store.state.token;
-
-axios.defaults.baseURL = "http://localhost:8000/";
-axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+const Api = axios.create({
+  baseURL: "http://127.0.0.1:8000/",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
 
 let x = false;
-axios.interceptors.response.use(
+Api.interceptors.response.use(
   (resp) => resp,
   async (error) => {
     if (error.response.status === 401 && !x) {
@@ -17,3 +20,5 @@ axios.interceptors.response.use(
     return error;
   }
 );
+
+export default Api;

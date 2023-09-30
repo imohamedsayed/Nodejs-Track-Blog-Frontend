@@ -69,15 +69,15 @@ export default {
     const store = useStore();
     const router = useRouter();
     const state = reactive({
-      customer: computed(() => store.state.user),
+      user: computed(() => store.state.user),
       email: "",
       password: "",
       loading: false,
     });
 
     onMounted(() => {
-      if (state.customer) {
-        router.push("/home");
+      if (state.user) {
+        router.push("/blogs");
       }
     });
 
@@ -94,9 +94,13 @@ export default {
       if (!v$.value.$error) {
         state.loading = true;
         try {
-          router.push("/home");
+          await store.dispatch("login", {
+            email: state.email,
+            password: state.password,
+          });
+          router.push("/blogs");
         } catch (err) {
-          toast.error(err, {
+          toast.error(err.message, {
             autoClose: 1000,
           });
         }

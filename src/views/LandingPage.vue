@@ -34,6 +34,7 @@ export default {
 <style lang="scss" scoped>
 .landing-page {
   .intro {
+    padding-top: 100px;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -41,6 +42,7 @@ export default {
     height: calc(100vh - 380px);
     @media (max-width: 592px) {
       height: calc(100vh - 80px);
+      padding-top: 0;
     }
 
     .back-photo {
