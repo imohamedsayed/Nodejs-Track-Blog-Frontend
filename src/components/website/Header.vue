@@ -8,7 +8,7 @@
       <h3>SEF Blogs</h3>
     </div>
     <div class="navs text-center">
-      <router-link to="/all-blogs">Blogs</router-link>
+      <router-link to="/all-blogs" v-if="state.user?.isAdmin">Blogs</router-link>
       <router-link to="/blogs">My Blogs</router-link>
       <router-link to="/blogs/create">Create a blog</router-link>
     </div>
@@ -59,7 +59,7 @@ export default {
     const store = useStore();
     const router = useRouter();
     const state = reactive({
-      user: computed(() => store.state.user),
+      user: computed(() => store.state.user) || null,
     });
 
     const logout = () => {

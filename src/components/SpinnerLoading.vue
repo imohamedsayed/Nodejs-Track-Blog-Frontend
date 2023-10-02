@@ -45,7 +45,7 @@ export default {
 
   &-item {
     display: flex;
-    background: rgba(0, 0, 0, 0.007);
+    background: rgba(198, 10, 10, 0.007);
   }
 }
 

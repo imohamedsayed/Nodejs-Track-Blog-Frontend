@@ -2,15 +2,23 @@
   <div class="add-blog">
     <Header />
     <div class="container">
-      <h3>Update {{ id }}</h3>
-      <form @submit.prevent="create">
+      <form @submit.prevent="edit">
         <div class="form-field">
           <label>Blog title</label>
-          <input type="text" placeholder="title.." />
+          <input type="text" placeholder="title.." v-model="state.title" />
+          <span class="text-danger" v-if="v$.title.$error">
+            {{ v$.title.$errors[0].$message }}
+          </span>
         </div>
         <div class="form-field">
           <label>Blog body</label>
-          <textarea placeholder="write your content ..."></textarea>
+          <textarea
+            placeholder="write your content ..."
+            v-model="state.body"
+          ></textarea>
+          <span class="text-danger" v-if="v$.body.$error">
+            {{ v$.body.$errors[0].$message }}
+          </span>
         </div>
         <div class="form-field img">
           <img
@@ -23,7 +31,7 @@
           <label for="img" class="mt-5">Upload Image</label>
         </div>
         <div class="text-center">
-          <button>Create</button>
+          <button>Update</button>
         </div>
       </form>
     </div>
@@ -34,39 +42,107 @@
 <script>
 import Header from "@/components/website/Header.vue";
 import SpinnerLoading from "@/components/SpinnerLoading.vue";
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, onMounted } from "vue";
+import { toast } from "vue3-toastify";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import Api from "@/axios";
 import { useVuelidate } from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
-import { toast } from "vue3-toastify";
-
 export default {
   components: { Header, SpinnerLoading },
   props: ["id"],
-  setup() {
+  setup(props) {
+    const store = useStore();
+    const router = useRouter();
     const state = reactive({
+      user: computed(() => store.state.user),
       loading: false,
       title: "",
       body: "",
       img: "",
     });
-
     const placeholder = ref(null);
+
+    onMounted(async () => {
+      if (!state.user) {
+        router.push("/login");
+      }
+
+      state.loading = true;
+      try {
+        const res = await Api.get("/blogs/" + props.id);
+
+        if (res.status === 200) {
+          const blog = res.data.blog;
+          if (blog.user._id != state.user._id) {
+            router.push("/");
+          }
+          state.title = blog.title;
+          state.body = blog.body;
+          if (blog.image) {
+            placeholder.value.src = "http://localhost:8000/" + blog.image;
+          }
+        } else {
+          toast.error(res.response.data.message, {
+            autoClose: 2000,
+          });
+        }
+      } catch (error) {
+        toast.error(error.message, {
+          autoClose: 2000,
+        });
+      }
+      state.loading = false;
+    });
 
     const previewImage = (e) => {
       state.img = e.target.files[0];
       placeholder.value.src = URL.createObjectURL(state.img);
     };
 
-    const create = async () => {
-      try {
-      } catch (err) {
-        toast.error(err, {
+    const rules = computed(() => {
+      return {
+        title: { required },
+        body: { required, minLength: minLength(50) },
+      };
+    });
+    const v$ = useVuelidate(rules, state);
+
+    const edit = async () => {
+      v$.value.$validate();
+      if (!v$.value.$error) {
+        state.loading = true;
+        const data = {
+          title: state.title,
+          body: state.body,
+          image: state.img,
+        };
+        try {
+          const res = await Api.patch("/blogs/" + props.id, data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+
+          if (res.status === 200) {
+            toast.success("Blog Updated Successfully!", { autoClose: 3000 });
+          } else {
+            toast.error(res.response.data.message, { autoClose: 3000 });
+          }
+        } catch (err) {
+          toast.error(err.message, {
+            autoClose: 1000,
+          });
+        }
+        state.loading = false;
+      } else {
+        toast.error("Missing Data", {
           autoClose: 1000,
         });
       }
-      state.loading = false;
     };
-    return { state, create, placeholder, previewImage };
+    return { state, v$, edit, placeholder, previewImage };
   },
 };
 </script>

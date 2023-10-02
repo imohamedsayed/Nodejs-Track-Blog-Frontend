@@ -2,17 +2,20 @@
   <div class="add-blog">
     <Header />
     <div class="container">
-      <form @submit.prevent="create">
+      <form @submit.prevent="create" ref="form">
         <div class="form-field">
           <label>Blog title</label>
-          <input type="text" placeholder="title.." />
+          <input type="text" placeholder="title.." v-model="state.title" />
           <span class="text-danger" v-if="v$.title.$error">
             {{ v$.title.$errors[0].$message }}
           </span>
         </div>
         <div class="form-field">
           <label>Blog body</label>
-          <textarea placeholder="write your content ..."></textarea>
+          <textarea
+            placeholder="write your content ..."
+            v-model="state.body"
+          ></textarea>
           <span class="text-danger" v-if="v$.body.$error">
             {{ v$.body.$errors[0].$message }}
           </span>
@@ -28,7 +31,7 @@
           <label for="img" class="mt-5">Upload Image</label>
         </div>
         <div class="text-center">
-          <button>Create</button>
+          <button type="submit">Create</button>
         </div>
       </form>
     </div>
@@ -39,23 +42,36 @@
 <script>
 import Header from "@/components/website/Header.vue";
 import SpinnerLoading from "@/components/SpinnerLoading.vue";
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, onMounted } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
 import { toast } from "vue3-toastify";
+import Api from "@/axios";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default {
   components: { Header, SpinnerLoading },
   setup() {
+    const store = useStore();
+    const router = useRouter();
+
     const state = reactive({
+      user: computed(() => store.state.user),
       loading: false,
       title: "",
       body: "",
       img: "",
     });
 
-    const placeholder = ref(null);
+    onMounted(() => {
+      if (!state.user) {
+        router.push("/login");
+      }
+    });
 
+    const placeholder = ref(null);
+    const form = ref(null);
     const rules = computed(() => {
       return {
         title: { required },
@@ -73,9 +89,29 @@ export default {
       v$.value.$validate();
       if (!v$.value.$error) {
         state.loading = true;
+        const data = {
+          title: state.title,
+          body: state.body,
+          image: state.img,
+        };
         try {
+          const res = await Api.post("/blogs/", data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          if (res.status === 201) {
+            toast.success("Blog created successfully", {
+              autoClose: 1000,
+            });
+            setTimeout(() => {
+              router.push("/blogs");
+            }, 1000);
+          } else {
+            toast.error(res.response.data.error, {
+              autoClose: 2000,
+            });
+          }
         } catch (err) {
-          toast.error(err, {
+          toast.error(err.message, {
             autoClose: 1000,
           });
         }
@@ -86,7 +122,7 @@ export default {
         });
       }
     };
-    return { state, create, v$, placeholder, previewImage };
+    return { state, create, v$, placeholder, previewImage, form };
   },
 };
 </script>
