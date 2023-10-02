@@ -71,8 +71,8 @@ export default {
       user: computed(() => store.state.user),
     });
 
-    const logout = () => {
-      store.dispatch("Logout");
+    const logout = async () => {
+      await store.dispatch("Logout");
       router.push("/");
     };
     return { state, logout };

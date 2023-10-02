@@ -39,7 +39,7 @@ const actions = {
       throw error;
     }
   },
-  async login(context, {  email, password }) {
+  async login(context, { email, password }) {
     const res = await Api.post("/auth/login", { email, password });
     if (res.status === 200) {
       const user = res.data.user;
@@ -53,9 +53,15 @@ const actions = {
     }
   },
 
-  Logout(context) {
-    context.commit("setToken", null);
-    context.commit("setUser", null);
+  async Logout(context) {
+    try {
+      await Api.get("/auth/logout");
+
+      context.commit("setToken", null);
+      context.commit("setUser", null);
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
 

@@ -15,7 +15,7 @@ Api.interceptors.response.use(
   async (error) => {
     if (error.response.status === 401 && !x) {
       x = true;
-      store.dispatch("Logout");
+      await store.dispatch("Logout");
     }
     return error;
   }
